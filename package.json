@@ -1,0 +1,35 @@
+{
+  "name": "frontend_gulp_startpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/net22sky/frontend_gulp_startpack.git"
+  },
+  "keywords": [
+    "gulp",
+    "startpack",
+    "frontend",
+    "scss",
+    "css"
+  ],
+  "author": "net22sky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/net22sky/frontend_gulp_startpack/issues"
+  },
+  "homepage": "https://github.com/net22sky/frontend_gulp_startpack#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat-css": "^3.1.0",
+    "gulp-cssnano": "^2.1.3",
+    "gulp-sass": "^5.1.0",
+    "sass": "^1.58.0"
+  }
+}
