@@ -1,41 +1,38 @@
-const { src, dest, watch, parallel } = require("gulp");
-const sass = require('gulp-sass')(require('sass'));
-const minify = require('gulp-clean-css');
-
-const autoprefixer = require('autoprefixer')
-const sourcemaps = require('gulp-sourcemaps')
-const postcss = require('gulp-postcss')
+const { src, dest, watch } = require("gulp");
+const sass = require("gulp-sass")(require("sass"));
+const minify = require("gulp-clean-css");
+const autoprefixer = require("autoprefixer");
+const sourcemaps = require("gulp-sourcemaps");
+const postcss = require("gulp-postcss");
 const eslint = require("gulp-eslint");
 
-let src_folder = './src/scss/*.scss';
-let dest_folder = './static/css';
+const srcFolder = "./src/scss/*.scss";
+const targetFolder = "./static/css";
 
-function generateCSS(cb) {
-    src(src_folder)
+const convertScss = (cb) => {
+  src(srcFolder)
     .pipe(sourcemaps.init())
-        .pipe(sass().on('error', sass.logError))
-        .pipe(minify())
-        .pipe(postcss([ autoprefixer() ]))
-    .pipe(sourcemaps.write('.'))
-        .pipe(dest(dest_folder));
-    cb();
-}
+    .pipe(sass().on("error", sass.logError))
+    .pipe(minify())
+    .pipe(postcss([autoprefixer()]))
+    .pipe(sourcemaps.write("."))
+    .pipe(dest(targetFolder));
+  cb();
+};
 
-function runLinter(cb) {
-    return src(['**/*.js', '!node_modules/**'])
-        .pipe(eslint())
-        .pipe(eslint.format()) 
-        .pipe(eslint.failAfterError())
-        .on('end', function() {
-            cb();
-        });
-}
+const runLinter = (cb) =>
+  src(["**/*.js", "!node_modules/**"])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
+    .on("end", function () {
+      cb();
+    });
 
+const watchFiles = (cb) => {
+  watch(srcFolder, convertScss);
+};
 
-function watchFiles(cb) {
-    watch(src_folder, generateCSS);
-}
-
-exports.css = generateCSS;
+exports.css = convertScss;
 exports.watch = watchFiles;
 exports.lint = runLinter;
