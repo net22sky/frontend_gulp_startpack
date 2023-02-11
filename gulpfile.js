@@ -5,18 +5,15 @@ const autoprefixer = require("autoprefixer");
 const sourcemaps = require("gulp-sourcemaps");
 const postcss = require("gulp-postcss");
 const eslint = require("gulp-eslint");
-const concat = require ( 'gulp-concat' );
+const concat = require("gulp-concat");
 const typeScript = require("gulp-typescript");
-const uglify = require('gulp-uglify');
-
+const uglify = require("gulp-uglify");
+const babel = require("gulp-babel");
 
 const srcFolder = "./src/scss/*.scss";
-const targetFolder = "./static/css";
+const targetFolder = "./dist/css";
 const srcTs = "src/**/*.ts";
 const srcJsFolder = "./src/js/*.js";
-
-
-
 
 const convertTs = (cb) => {
   src(srcTs)
@@ -29,8 +26,8 @@ const convertTs = (cb) => {
       })
     )
     .pipe(sourcemaps.write("."))
-    .pipe(dest(targetFolder+'/js/'));
-    cb();
+    .pipe(dest(targetFolder + "/js/"));
+  cb();
 };
 
 const convertScss = (cb) => {
@@ -40,11 +37,10 @@ const convertScss = (cb) => {
     .pipe(minify())
     .pipe(postcss([autoprefixer()]))
     .pipe(sourcemaps.write("."))
-    .pipe(dest(targetFolder + '/css/'))
+    .pipe(dest(targetFolder + "/css/"))
     .on("end", function () {
       cb();
     });
-
 };
 
 const runLinter = (cb) =>
@@ -58,16 +54,20 @@ const runLinter = (cb) =>
 
 const jsTask = (cb) => {
   src([srcJsFolder])
-  .pipe(sourcemaps.init())
-    .pipe(concat('all.js'))
+    .pipe(sourcemaps.init())
+    .pipe(
+      babel({
+        presets: ["@babel/preset-env"],
+      })
+    )
+    .pipe(concat("all.js"))
     .pipe(uglify())
     .pipe(sourcemaps.write("."))
-    .pipe(dest(targetFolder+'/js/'))
+    .pipe(dest(targetFolder + "/js/"))
     .on("end", function () {
       cb();
     });
-  };
-
+};
 
 const watchFiles = (cb) => {
   watch(srcFolder, convertScss);
@@ -78,4 +78,4 @@ exports.watch = watchFiles;
 exports.lint = runLinter;
 exports.ts = convertTs;
 exports.js = jsTask;
-exports.build = parallel(convertTs, convertScss,jsTask);
+exports.build = parallel(convertTs, convertScss, jsTask);

@@ -25,10 +25,13 @@
   },
   "homepage": "https://github.com/net22sky/frontend_gulp_startpack#readme",
   "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
     "autoprefixer": "^10.4.13",
     "browser-sync": "^2.27.11",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^8.0.0",
+    "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
     "gulp-concat-css": "^3.1.0",
