@@ -9,6 +9,8 @@ const concat = require("gulp-concat");
 const typeScript = require("gulp-typescript");
 const uglify = require("gulp-uglify");
 const babel = require("gulp-babel");
+const plumber = require('gulp-plumber');
+
 
 const srcFolder = "./src/scss/*.scss";
 const targetFolder = "./dist/css";
@@ -17,6 +19,7 @@ const srcJsFolder = "./src/js/*.js";
 
 const convertTs = (cb) => {
   src(srcTs)
+  .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(
       typeScript({
@@ -32,6 +35,7 @@ const convertTs = (cb) => {
 
 const convertScss = (cb) => {
   src(srcFolder)
+  .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(sass().on("error", sass.logError))
     .pipe(minify())
@@ -54,6 +58,7 @@ const runLinter = (cb) =>
 
 const jsTask = (cb) => {
   src([srcJsFolder])
+  .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(
       babel({
