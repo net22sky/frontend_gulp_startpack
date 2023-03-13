@@ -1,4 +1,4 @@
-const { src, dest, watch, parallel } = require("gulp");
+const { src, dest, watch, parallel,series } = require("gulp");
 const sass = require("gulp-sass")(require("sass"));
 const minify = require("gulp-clean-css");
 const autoprefixer = require("autoprefixer");
@@ -10,15 +10,33 @@ const typeScript = require("gulp-typescript");
 const uglify = require("gulp-uglify");
 const babel = require("gulp-babel");
 const plumber = require('gulp-plumber');
+const rimraf = require('rimraf');
 
 
-const srcFolder = "./src/scss/*.scss";
-const targetFolder = "./dist/css";
-const srcTs = "src/**/*.ts";
-const srcJsFolder = "./src/js/*.js";
+const paths = {
+	scss: './src/scss/*.scss',
+	js: './src/js/*.js',
+  ts: "src/**/*.ts",
+  release: "./dist",
+};
+
+
+// Clean
+
+function clean(cb) {
+	//return del(['./dist'])
+  rimraf.sync(paths.release);
+  cb();
+}
+
+
+//const clean = await deleteAsync(['dist/*.*'], {dryRun: true});
+
+
+// Ts task: concatenates and uglifies ts files to output.js
 
 const convertTs = (cb) => {
-  src(srcTs)
+  src(paths.ts)
   .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(
@@ -29,19 +47,22 @@ const convertTs = (cb) => {
       })
     )
     .pipe(sourcemaps.write("."))
-    .pipe(dest(targetFolder + "/js/"));
+    .pipe(dest(paths.release + "/js/"));
   cb();
 };
 
+
+// Sass task: compiles the style.scss file into style.css
+
 const convertScss = (cb) => {
-  src(srcFolder)
+  src(paths.scss)
   .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(sass().on("error", sass.logError))
     .pipe(minify())
     .pipe(postcss([autoprefixer()]))
     .pipe(sourcemaps.write("."))
-    .pipe(dest(targetFolder + "/css/"))
+    .pipe(dest(paths.release + "/css/"))
     .on("end", function () {
       cb();
     });
@@ -56,8 +77,11 @@ const runLinter = (cb) =>
       cb();
     });
 
-const jsTask = (cb) => {
-  src([srcJsFolder])
+
+    // JS task: concatenates and uglifies JS files to script.js
+
+    const jsTask = (cb) => {
+  src([paths.js])
   .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(
@@ -65,22 +89,23 @@ const jsTask = (cb) => {
         presets: ["@babel/preset-env"],
       })
     )
-    .pipe(concat("all.js"))
+    .pipe(concat("script.js"))
     .pipe(uglify())
     .pipe(sourcemaps.write("."))
-    .pipe(dest(targetFolder + "/js/"))
+    .pipe(dest(paths.release + "/js/"))
     .on("end", function () {
       cb();
     });
 };
 
 const watchFiles = (cb) => {
-  watch(srcFolder, convertScss);
+  watch(paths.scss, convertScss);
 };
 
+exports.clean = clean;
 exports.css = convertScss;
 exports.watch = watchFiles;
 exports.lint = runLinter;
-exports.ts = convertTs;
+exports.ts = series(clean,convertTs);
 exports.js = jsTask;
-exports.build = parallel(convertTs, convertScss, jsTask);
+exports.build = series(clean, parallel(convertTs, convertScss, jsTask));
