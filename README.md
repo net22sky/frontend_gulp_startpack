@@ -7,4 +7,3 @@ Install Node.js if you don't have it yet.
 Run npm install
 Run gulp to run the default Gulp task
 
-МаркетингИнтерактивные картинкиСписок интерактивных картинок
